@@ -27,6 +27,7 @@ public class OrderProcessingService {
   }
 
   public boolean wasOrderProcessed(long orderId) {
+    logger.info("Checking if order with id:{} was processed", orderId);
     return receivedOrderIds.contains(orderId);
   }
 

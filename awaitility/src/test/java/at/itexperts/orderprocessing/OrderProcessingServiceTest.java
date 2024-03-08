@@ -43,7 +43,7 @@ class OrderProcessingServiceTest {
                 amqpAdmin
                         .getQueueInfo(OrderProcessingService.OUTGOING_ORDER_QUEUE)
                         .getMessageCount()
-                    > initialMessageCount);
+                    == initialMessageCount + 1);
   }
 
   @Test
@@ -61,10 +61,12 @@ class OrderProcessingServiceTest {
 
   @Test
   @Disabled("not working due to no wait")
-  void checkOrderFlagWithoutAwaitility() {
+  void checkOrderFlagWithoutAwaitility() throws InterruptedException {
     long orderId = new Random().nextLong();
 
     sendOrderToIncomingQueue(orderId);
+
+    Thread.sleep(1000);
 
     assertThat(orderProcessingService.wasOrderProcessed(orderId)).isTrue();
   }
@@ -75,7 +77,9 @@ class OrderProcessingServiceTest {
 
     sendOrderToIncomingQueue(orderId);
 
-    waitAtMost(WAIT_DURATION).until(() -> orderProcessingService.wasOrderProcessed(orderId));
+    waitAtMost(WAIT_DURATION)
+        .pollInterval(Duration.of(1, ChronoUnit.MICROS))
+        .until(() -> orderProcessingService.wasOrderProcessed(orderId));
   }
 
   private void sendOrderToIncomingQueue(long orderId) {
