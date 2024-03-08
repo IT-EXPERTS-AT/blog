@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderProcessor {
 
-  private static final String INCOMING_ORDER_QUEUE = "incomingOrder";
+  private static final String INCOMING_ORDER_QUEUE = "incomingOrderQueue";
+  private static final String INCOMING_ORDER_ROUTING_KEY = "incomingOrder";
   private static final String ORDER_EXCHANGE = "orderExchange";
 
   private final Logger logger = LoggerFactory.getLogger(OrderProcessor.class);
@@ -27,6 +28,8 @@ public class OrderProcessor {
 
   @PostConstruct
   public void sendToIncomingAfterConstruct() {
-    amqpTemplate.convertAndSend(ORDER_EXCHANGE, INCOMING_ORDER_QUEUE, new IncomingOrder(1, 2));
+    logger.info("Sending incoming order");
+    amqpTemplate.convertAndSend(
+        ORDER_EXCHANGE, INCOMING_ORDER_ROUTING_KEY, new IncomingOrder(1, 2));
   }
 }
