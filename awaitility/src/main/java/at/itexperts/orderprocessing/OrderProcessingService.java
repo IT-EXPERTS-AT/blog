@@ -26,21 +26,8 @@ public class OrderProcessingService {
     this.receivedOrderIds = new HashSet<>();
   }
 
-  private static ProductCategory determineProductCategory(long productId) {
-    if (productId < 100) {
-      return ProductCategory.ELECTRONICS;
-    } else if (productId > 100 && productId < 200) {
-      return ProductCategory.BOOKS;
-    }
-    return ProductCategory.FOOD;
-  }
-
   public boolean wasOrderProcessed(long orderId) {
     return receivedOrderIds.contains(orderId);
-  }
-
-  private OutgoingOrder transformIntoOutgoingMessage(IncomingOrder incomingOrder) {
-    return new OutgoingOrder(incomingOrder.id(), incomingOrder.productId(), determineProductCategory(incomingOrder.productId()));
   }
 
   @RabbitListener(queues = INCOMING_ORDER_QUEUE)
@@ -50,5 +37,21 @@ public class OrderProcessingService {
     amqpTemplate.convertAndSend(ORDER_EXCHANGE, OUTGOING_ORDER_ROUTING_KEY, outgoingOrder);
     receivedOrderIds.add(incomingOrder.id());
     logger.info("Sent outgoing order: {}", outgoingOrder);
+  }
+
+  private OutgoingOrder transformIntoOutgoingMessage(IncomingOrder incomingOrder) {
+    return new OutgoingOrder(
+        incomingOrder.id(),
+        incomingOrder.productId(),
+        determineProductCategory(incomingOrder.productId()));
+  }
+
+  private static ProductCategory determineProductCategory(long productId) {
+    if (productId < 100) {
+      return ProductCategory.ELECTRONICS;
+    } else if (productId > 100 && productId < 200) {
+      return ProductCategory.BOOKS;
+    }
+    return ProductCategory.FOOD;
   }
 }
