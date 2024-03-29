@@ -35,7 +35,7 @@ class OrderProcessingServiceTest {
     int initialMessageCount =
         amqpAdmin.getQueueInfo(OrderProcessingService.OUTGOING_ORDER_QUEUE).getMessageCount();
 
-    sendOrderToIncomingQueue(1);
+    sendOrderToIncomingQueue();
 
     waitAtMost(WAIT_DURATION)
         .until(
@@ -48,7 +48,7 @@ class OrderProcessingServiceTest {
 
   @Test
   void shouldAddOrderToOutgoingQueue_V2() {
-    sendOrderToIncomingQueue(1);
+    sendOrderToIncomingQueue();
 
     waitAtMost(WAIT_DURATION)
         .until(
@@ -64,7 +64,7 @@ class OrderProcessingServiceTest {
   void checkOrderFlagWithoutAwaitility() throws InterruptedException {
     long orderId = new Random().nextLong();
 
-    sendOrderToIncomingQueue(orderId);
+    sendOrderWithIdToIncomingQueue(orderId);
 
     Thread.sleep(1000);
 
@@ -75,14 +75,18 @@ class OrderProcessingServiceTest {
   void checkOrderFlagWithAwaitility() {
     long orderId = new Random().nextLong();
 
-    sendOrderToIncomingQueue(orderId);
+    sendOrderWithIdToIncomingQueue(orderId);
 
     waitAtMost(WAIT_DURATION)
         .pollInterval(Duration.of(1, ChronoUnit.MICROS))
         .until(() -> orderProcessingService.wasOrderProcessed(orderId));
   }
 
-  private void sendOrderToIncomingQueue(long orderId) {
+  private void sendOrderToIncomingQueue() {
+    sendOrderWithIdToIncomingQueue(1);
+  }
+
+  private void sendOrderWithIdToIncomingQueue(long orderId) {
     amqpTemplate.convertAndSend(
         OrderProcessingService.ORDER_EXCHANGE,
         OrderProcessingService.INCOMING_ORDER_ROUTING_KEY,
