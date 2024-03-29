@@ -32,11 +32,17 @@ public class OrderProcessingService {
   }
 
   @RabbitListener(queues = INCOMING_ORDER_QUEUE)
-  public void processMessage(IncomingOrder incomingOrder) {
+  public void processOrder(IncomingOrder incomingOrder) {
     logger.info("Received incoming order: {}", incomingOrder);
+
     OutgoingOrder outgoingOrder = transformIntoOutgoingMessage(incomingOrder);
-    amqpTemplate.convertAndSend(ORDER_EXCHANGE, OUTGOING_ORDER_ROUTING_KEY, outgoingOrder);
+    sendOutgoingOrder(outgoingOrder);
+
     receivedOrderIds.add(incomingOrder.id());
+  }
+
+  private void sendOutgoingOrder(OutgoingOrder outgoingOrder) {
+    amqpTemplate.convertAndSend(ORDER_EXCHANGE, OUTGOING_ORDER_ROUTING_KEY, outgoingOrder);
     logger.info("Sent outgoing order: {}", outgoingOrder);
   }
 
