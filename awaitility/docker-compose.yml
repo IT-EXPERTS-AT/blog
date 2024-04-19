@@ -8,3 +8,6 @@ services:
     volumes:
       - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
       - ./config/definitions.json:/etc/rabbitmq/definitions.json:ro
+networks:
+  rabbit-mq-network:
+    name: rabbit-mq-network
