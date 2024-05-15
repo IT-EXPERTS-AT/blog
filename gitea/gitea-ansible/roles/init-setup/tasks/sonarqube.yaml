@@ -1,0 +1,143 @@
+---
+- name: sonarqube tasks
+  tags: sonarqube
+  block:
+  - name: "copy over sonarqube docker image folder"
+    become: yes
+    copy:
+      src: sonarqube-image
+      dest: /var/
+      mode: '0644'
+    register: sonarFiles
+
+  - name: Build sonarqube image
+    docker_image:
+      name: '{{ sonarqube_image_name }}'
+      build:
+        path: /var/sonarqube-image
+        pull: yes
+      source: build
+      force_source: "{{ sonarFiles.changed | ternary('yes', 'no', omit) }}"
+
+  - name: start postgres for sonarqube
+    docker_container:
+      image: postgres:16.1
+      name: '{{ sonarqube_postgres_container_name }}'
+      exposed_ports: '{{ sonarqube_postgres_exposed_ports }}'
+      env: '{{ sonarqube_postgres_environment }}'
+      volumes: '{{ sonarqube_postgres_exposed_volumes }}'
+      networks:
+        - name: '{{ docker_network_name }}'
+      state: started
+      restart_policy: unless-stopped
+
+  - name: start sonarqube
+    docker_container:
+      image: '{{ sonarqube_image_name }}'
+      name: '{{ sonarqube_container_name }}'
+      ports: '{{ sonarqube_published_ports }}'
+      exposed_ports: '{{ sonarqube_exposed_ports }}'
+      env: '{{ sonarqube_environment }}'
+      volumes: '{{ sonarqube_exposed_volumes }}'
+      networks:
+        - name: '{{ docker_network_name }}'
+      state: started
+      restart_policy: unless-stopped
+
+  - name: wait for sonarqube to be available
+    pause:
+      seconds: 10
+
+  - name: sonarqube configuration
+    tags: sonarqube-config
+    block:
+    - name: Login as admin
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/authentication/login?login={{ sonarqube_login_username }}&password={{ sonarqube_login_password }}'
+        method: POST
+      register: admin_login
+      ignore_errors: true
+
+    - name: change password, if login failed
+      when: admin_login.status == 401 or admin_login.status == 404
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/users/change_password?login={{ sonarqube_login_username }}&password={{ sonarqube_login_password }}&previousPassword={{ sonarqube_login_password_default }}'
+        method: POST
+        url_username: '{{ sonarqube_login_username }}'
+        url_password: '{{ sonarqube_login_password_default }}'
+        force_basic_auth: true
+        status_code: 204
+
+    - name: Login as admin (#2)
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/authentication/login?login={{ sonarqube_login_username }}&password={{ sonarqube_login_password }}'
+        method: POST
+      register: admin_login_success
+    - name: validate the login
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/authentication/validate'
+        method: GET
+        headers:
+          Cookie: "JWT-SESSION={{ admin_login_success.cookies['JWT-SESSION'] }}"
+        return_content: yes
+      register: admin_login_validate
+      failed_when: admin_login_validate.json.valid == false
+
+    - name: revoke user token
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/user_tokens/revoke?name=gitea'
+        method: POST
+        url_username: '{{ sonarqube_login_username }}'
+        url_password: '{{ sonarqube_login_password }}'
+        force_basic_auth: true
+        return_content: yes
+        status_code: 204
+    - name: create user token
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/user_tokens/generate?name=gitea'
+        method: POST
+        url_username: '{{ sonarqube_login_username }}'
+        url_password: '{{ sonarqube_login_password }}'
+        force_basic_auth: true
+        return_content: yes
+      register: generated_user_token
+
+    - name: set sonarqube token host variable
+      ansible.builtin.set_fact:
+        vault_sonarqube_token: '{{ generated_user_token.json.token }}'
+    - name: save sonarqube token in file
+      copy:
+        dest: '{{ destination_directory_gitea }}/sonarqube.txt'
+        content: '{{ vault_sonarqube_token }}'
+
+    - name: add ims quality profiles
+      loop: "{{ query('fileglob', '../../../../Sonarqube/custom-profiles/*') }}"
+      loop_control:
+        loop_var: quality_profile_file
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/qualityprofiles/restore'
+        method: POST
+        body_format: form-multipart
+        body:
+          backup:
+            content: "{{ lookup('file', quality_profile_file) }}"
+        url_username: '{{ sonarqube_login_username }}'
+        url_password: '{{ sonarqube_login_password }}'
+        force_basic_auth: true
+        return_content: yes
+    - name: set ims quality profiles as default
+      loop:
+       - css
+       - java
+       - ts
+       - web
+      loop_control:
+        loop_var: quality_profile_language
+      ansible.builtin.uri:
+        url: '{{ sonarqube_api_url }}/qualityprofiles/set_default?language={{ quality_profile_language }}&qualityProfile=IMS%20way'
+        method: POST
+        url_username: '{{ sonarqube_login_username }}'
+        url_password: '{{ sonarqube_login_password }}'
+        force_basic_auth: true
+        status_code: 204
+        return_content: yes

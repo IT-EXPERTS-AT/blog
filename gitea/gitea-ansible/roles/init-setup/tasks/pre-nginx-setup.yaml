@@ -1,0 +1,10 @@
+---
+# certbot needs port 80
+- name: free port 80
+  block:
+    - name: stop & disable apache
+      ansible.builtin.systemd_service:
+        name: apache2.service
+        enabled: false
+        masked: true
+        state: stopped

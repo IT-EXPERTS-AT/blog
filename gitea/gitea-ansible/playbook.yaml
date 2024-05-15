@@ -1,0 +1,6 @@
+---
+- name: Setup Gitea
+  hosts: target
+  become: yes
+  roles:
+    - { role: 'init-setup', tags: 'init-setup' }

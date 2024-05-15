@@ -1,0 +1,48 @@
+version: "3"
+
+volumes:
+  gitea-data:
+    name: gitea-data
+    driver: local
+  gitea-config:
+    name: gitea-config
+    driver: local
+  gitea-db-data:
+    name: gitea-db-data
+    driver: local
+
+services:
+  server:
+    image: ${DOCKER_IMAGE_NAME_GITEA}
+    container_name: ${DOCKER_CONTAINER_NAME_GITEA}
+    restart: always
+    volumes:
+      - gitea-data:/var/lib/gitea
+      - gitea-config:/etc/gitea
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+      - "2222:2222"
+    depends_on:
+      - db
+    networks:
+      - gitea-net
+
+  db:
+    image: postgres:16
+    container_name: ${DOCKER_CONTAINER_NAME_GITEA_DB}
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=gitea
+    volumes:
+      - gitea-db-data:/var/lib/postgresql/data
+    networks:
+      - gitea-net
+
+networks:
+  gitea-net:
+    external: true
+    name: ${DOCKER_EXTERNAL_NETWORK_NAME}

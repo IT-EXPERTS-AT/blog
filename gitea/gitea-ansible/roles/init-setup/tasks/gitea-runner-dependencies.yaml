@@ -1,0 +1,29 @@
+---
+- name: Build docker image for runner job with preinstalled chrome dependencies
+  docker_image:
+    name: '{{ docker_image_name_runner_job_with_chrome_deps }}'
+    build:
+      path: '{{ destination_directory_gitea }}/docker-images'
+      dockerfile: Dockerfile_runner_jobs_chrome_deps
+      pull: yes
+    source: build
+    force_source: true
+
+- name: log into gitea container registry
+  community.docker.docker_login:
+    registry_url: '{{ host_dns }}'
+    username: '{{ gitea_user_admin_username }}'
+    password: '{{ gitea_user_admin_password }}'
+    reauthorize: true
+
+- name: push to gitea container registry
+  community.docker.docker_image:
+    name: '{{ docker_image_name_runner_job_with_chrome_deps }}'
+    repository: '{{ host_dns }}/{{ gitea_user_admin_username }}/{{ docker_image_name_runner_job_with_chrome_deps }}:latest'
+    push: true
+    source: local
+
+- name: log out of gitea container registry
+  community.docker.docker_login:
+    registry_url: '{{ host_dns }}'
+    state: absent

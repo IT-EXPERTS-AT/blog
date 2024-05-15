@@ -1,0 +1,81 @@
+---
+shared_tasks: '../../../../shared_tasks'
+
+host_ipv4:
+host_dns:
+
+source_directory_name_gitea: 'gitea'
+destination_working_directory_gitea: '/var/'
+destination_directory_gitea: '{{ destination_working_directory_gitea }}{{ source_directory_name_gitea }}'
+
+host_backup_target_directory: '{{ destination_directory_gitea }}/backup'
+
+docker_image_name_gitea: 'gitea/gitea:1.21.7-rootless'
+docker_image_name_gitea_runner: 'gitea/act_runner:nightly'
+docker_network_name: 'usernet'
+docker_container_name_gitea: gitea
+docker_container_name_gitea_db: gitea-postgres
+docker_container_name_gitea_runner_main: gitea-runner-main
+docker_container_name_nginx: nginx
+
+docker_image_name_runner_job_with_chrome_deps: runner-job-with-chrome-deps
+
+gitea_config_domain: '{{ host_dns }}'
+gitea_config_root_url: 'https://{{ host_dns }}'
+gitea_api_url: '{{ gitea_config_root_url }}/api/v1'
+
+gitea_act_runner_cache_host_ip: '{{ host_ipv4 }}'
+
+# shared tasks / nginx config
+server_domain: '{{ host_dns }}'
+ims_dev_domain:
+certbot_domains: '{{ server_domain }} {{ ims_dev_domain }}'
+certbot_directory: '/data/certbot'
+regenerate_certs: '{{ arg_regenerate_certs | default(false) | bool }}'
+nginx_base_directory: '/var/nginx'
+nginx_config_templates:
+  - 'conf.d/additional-sites/ims-dev.conf'
+
+
+# shared tasks / postgres
+postgres_container_name: 'postgres'
+
+
+# sonarqube
+sonarqube_image_name: 'sonarqube-docker'
+sonarqube_container_name: 'sonarqube'
+sonarqube_published_ports:
+  - '127.0.0.1:9000:9000'
+sonarqube_exposed_ports:
+  - '9000'
+sonarqube_data_volume_name: 'sonarqube_data'
+sonarqube_extension_volume_name: 'sonarqube_extensions'
+sonarqube_logs_volume_name: 'sonarqube_logs'
+sonarqube_exposed_volumes:
+  - '{{ sonarqube_data_volume_name }}:/opt/sonarqube/data'
+  - '{{ sonarqube_extension_volume_name }}:/opt/sonarqube/extensions'
+  - '{{ sonarqube_logs_volume_name }}:/opt/sonarqube/logs'
+
+sonarqube_postgres_user: 'sonar'
+sonarqube_postgres_password: '{{ vault_sonarqube_postgres_pw }}'
+
+sonarqube_environment:
+  SONAR_JDBC_URL: 'jdbc:postgresql://{{ sonarqube_postgres_container_name }}:5432/sonar'
+  SONAR_JDBC_USERNAME: '{{ sonarqube_postgres_user }}'
+  SONAR_JDBC_PASSWORD: '{{ sonarqube_postgres_password }}'
+  SONAR_SEARCH_JAVAADDITIONALOPTS: "-Dnode.store.allow_mmap=false"
+
+sonarqube_postgres_container_name: 'sonarqube_db'
+sonarqube_postgres_environment:
+  POSTGRES_USER: '{{ sonarqube_postgres_user }}'
+  POSTGRES_PASSWORD: '{{ sonarqube_postgres_password }}'
+sonarqube_postgres_volume_name: 'sonarqube_postgres'
+sonarqube_postgres_data_volume_name: 'sonarqube_postgres_data'
+sonarqube_postgres_exposed_ports:
+  - '5432'
+sonarqube_postgres_exposed_volumes:
+  - '{{ sonarqube_postgres_volume_name }}:/var/lib/postgresql'
+  - '{{ sonarqube_postgres_data_volume_name }}:/var/lib/postgresql/data'
+
+sonarqube_root_url: https://{{ host_dns }}/sonarqube
+sonarqube_api_url: '{{ sonarqube_root_url }}/api'

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+docker exec -u git -w /tmp {{ docker_container_name_gitea }} bash -c '/usr/local/bin/gitea dump -c /etc/gitea/app.ini -d postgres --skip-package-data'
+docker exec {{ docker_container_name_gitea }} bash -c "find /tmp -name "gitea-dump-*.zip" -exec mv '{}' /tmp/backup/ \;"
+docker cp {{ docker_container_name_gitea }}:/tmp/backup/. {{ host_backup_target_directory }}/.
+
+cd {{ host_backup_target_directory }}
+
+CURRENT_TIMESTAMP=$(date +%s)
+LATEST_BACKUP_FILE_NAME=$(ls -ta gitea-dump-*.zip | head -1)
+NEW_BACKUP_FILE_NAME="gitea-dump-$CURRENT_TIMESTAMP"
+
+unzip "$LATEST_BACKUP_FILE_NAME" -d "$NEW_BACKUP_FILE_NAME"
+
+# remove action artifacts, because not important to keep & minify backup size
+rm -rf "$NEW_BACKUP_FILE_NAME/data/actions_artifacts"
+
+# create repo only backup
+zip -r "$NEW_BACKUP_FILE_NAME-repos.zip" "$NEW_BACKUP_FILE_NAME/repos"
+# create complete backup
+zip -r "$NEW_BACKUP_FILE_NAME.zip" "$NEW_BACKUP_FILE_NAME"
+
+# remove unzipped backup directory
+rm -rf "$NEW_BACKUP_FILE_NAME"
+# remove initial backup file
+rm "$LATEST_BACKUP_FILE_NAME"
+
+# change file ownership to admin
+find {{ host_backup_target_directory }} -name "gitea-dump-*.zip" -exec chown {{ gitea_user_admin_username }} {} \;
+
+# clean up inside gitea docker container
+docker exec {{ docker_container_name_gitea }} bash -c "rm -rf /tmp/backup/*"
+
+# remove old backups - keep newest 10 versions - need to be 20 because of additional "repo" backup
+cd {{ host_backup_target_directory }}
+GITEA_DUMP_COUNT=`ls -tra gitea-dump-*.zip | wc -l`
+if [ $GITEA_DUMP_COUNT -gt 20 ] ; then
+        GITEA_DUMP_REMOVE_COUNT=$((GITEA_DUMP_COUNT - 20))
+        ls -tra gitea-dump-*.zip | head -$GITEA_DUMP_REMOVE_COUNT | xargs rm
+fi

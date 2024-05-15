@@ -1,0 +1,11 @@
+---
+- name: restart sshd
+  become: yes
+  systemd_service:
+      name: sshd
+      state: restarted
+
+- name: restart gitea container
+  become: yes
+  shell:
+    cmd: 'docker restart {{ docker_container_name_gitea }}'

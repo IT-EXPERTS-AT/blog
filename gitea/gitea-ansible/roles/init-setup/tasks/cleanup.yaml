@@ -1,0 +1,23 @@
+---
+- name: Delete env file for gitea
+  file:
+    path: '{{ destination_directory_gitea }}/.env'
+    state: absent
+
+- name: Delete env file for act runner
+  file:
+    path: '{{ destination_directory_gitea }}/act-runner/.env'
+    state: absent
+
+- name: Delete gitea config file
+  file:
+    path: '{{ destination_directory_gitea }}/gitea-config/app.ini'
+    state: absent
+
+- name: Prune everything docker
+  docker_prune:
+    containers: yes
+    images: yes
+    networks: yes
+    volumes: yes
+    builder_cache: yes

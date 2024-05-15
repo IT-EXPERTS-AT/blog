@@ -1,0 +1,58 @@
+---
+- name: copy over gitea folder
+  copy:
+    src: gitea
+    dest: '{{ destination_working_directory_gitea }}'
+- name: copy over env file
+  template:
+    src: .env.j2
+    dest: '{{ destination_directory_gitea }}/.env'
+- name: copy over config file
+  template:
+    src: gitea-config/app.ini.j2
+    dest: '{{ destination_directory_gitea }}/gitea-config/app.ini'
+
+- name: Start docker compose with gitea + postgres with default config
+  community.docker.docker_compose_v2:
+    env_files: '{{ destination_directory_gitea }}/.env'
+    project_src: '{{ destination_directory_gitea }}'
+    state: present
+    recreate: always
+
+- name: wait for container to be available
+  pause:
+    seconds: 5
+
+- name: copy over custom gitea configuration
+  community.docker.docker_container_copy_into:
+    container: '{{ docker_container_name_gitea }}'
+    path: '{{ destination_directory_gitea }}/gitea-config/app.ini'
+    container_path: /etc/gitea/app.ini
+  notify:
+    - restart gitea container
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Create admin user
+  community.docker.docker_container_exec:
+    container: '{{ docker_container_name_gitea }}'
+    command: /bin/bash gitea admin user create --username {{ gitea_user_admin_username }} --password {{ gitea_user_admin_password }} --email {{ gitea_user_admin_email }} --admin --must-change-password=false
+  register: create_user_admin_result
+  # fail only on: return code is not success & 'already exists' is not in stderr
+  # -> skip failure, if user (with specified --username) already exists
+  failed_when: >
+    (create_user_admin_result.rc != 0) and
+    ('CreateUser: user already exists [name: gitea-admin]' not in create_user_admin_result.stderr)
+
+- name: Add google oauth
+  community.docker.docker_container_exec:
+    container: gitea
+    command: /bin/bash gitea admin auth add-oauth --name google-auth --provider gplus --key {{ gitea_oauth_google_key }} --secret {{ gitea_oauth_google_secret }}
+  register: create_google_oauth_provider_result
+  # fail only on: return code is not success & 'already exists' is not in stderr
+  # -> skip failure, if oauth provider (with specified --name) already exists
+  failed_when: >
+    (create_google_oauth_provider_result.rc != 0) and
+    ('Command error: login source already exists [name: google-auth]' not in create_google_oauth_provider_result.stderr)
+

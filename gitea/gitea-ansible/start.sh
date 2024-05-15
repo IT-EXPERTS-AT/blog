@@ -1,0 +1,1 @@
+ansible-playbook -i inventory.ini playbook.yaml --ask-become-pass --ask-vault-pass --tags "init-setup"

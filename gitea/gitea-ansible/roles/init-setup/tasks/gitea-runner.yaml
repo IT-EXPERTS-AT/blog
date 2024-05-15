@@ -1,0 +1,31 @@
+---
+- name: Obtain a registration token (instance level)
+  community.docker.docker_container_exec:
+    container: '{{ docker_container_name_gitea }}'
+    command: /bin/bash gitea actions generate-runner-token
+  register: instance_runner_token
+  retries: 3
+  delay: 5
+  until: instance_runner_token.rc == 0
+
+- name: Copy over config file
+  template:
+    src: act-runner/main/config.yaml.j2
+    dest: '{{ destination_directory_gitea }}/act-runner/main/config.yaml'
+- name: Copy over env file
+  template:
+    src: act-runner/.env.j2
+    dest: '{{ destination_directory_gitea }}/act-runner/.env'
+
+- name: Write token to environment of docker compose
+  ansible.builtin.lineinfile:
+    path: '{{ destination_directory_gitea }}/act-runner/.env'
+    regexp: '^INSTANCE_REGISTRATION_TOKEN='
+    line: INSTANCE_REGISTRATION_TOKEN={{ instance_runner_token.stdout }}
+
+- name: Start docker compose for all initial act runners
+  community.docker.docker_compose_v2:
+    env_files: '{{ destination_directory_gitea }}/act-runner/.env'
+    project_src: '{{ destination_directory_gitea }}/act-runner'
+    state: present
+    recreate: always

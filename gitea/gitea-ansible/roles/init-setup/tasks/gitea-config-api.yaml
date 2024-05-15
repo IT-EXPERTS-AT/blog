@@ -1,0 +1,164 @@
+# -------------- INFO ----------------
+# these steps are only useful to run, if the 'abc-org' organisation is created on gitea
+# ------------------------------------
+---
+- name: gitea config using API
+  tags: gitea-config
+  block:
+  - name: add sonarqube token to 'abc-org' secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/SONAR_TOKEN'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ vault_sonarqube_token }}" }'
+      body_format: json
+      status_code: [201, 204]
+  - name: add sonarqube host url to 'abc-org' secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/SONAR_HOST_URL'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ sonarqube_root_url }}" }'
+      body_format: json
+      status_code: [201, 204]
+  - name: create private access token (PAT) for gitea-admin with scope 'read:package'
+    block:
+    - name: clean token
+      ansible.builtin.uri:
+        url: '{{ gitea_api_url }}/users/{{ gitea_user_admin_username }}/tokens/CONTAINER_REGISTRY_PULL_TOKEN'
+        method: DELETE
+        url_username: '{{ gitea_user_admin_username }}'
+        url_password: '{{ gitea_user_admin_password }}'
+        force_basic_auth: true
+        status_code: [204, 404]
+    - name: create token new
+      ansible.builtin.uri:
+        url: '{{ gitea_api_url }}/users/{{ gitea_user_admin_username }}/tokens'
+        method: POST
+        url_username: '{{ gitea_user_admin_username }}'
+        url_password: '{{ gitea_user_admin_password }}'
+        force_basic_auth: true
+        body: '{ "name": "CONTAINER_REGISTRY_PULL_TOKEN", "scopes": ["read:package"] }'
+        body_format: json
+        status_code: [201]
+        return_content: yes
+      register: gitea_admin_container_registry_pull_token
+  - name: add read PAT to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/PAT_REGISTRY_PULL'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ gitea_admin_container_registry_pull_token.json.sha1 }}" }'
+      body_format: json
+      status_code: [201, 204]
+
+  - name: create private access token (PAT) for gitea-admin with scope 'write:package'
+    block:
+    - name: clean token
+      ansible.builtin.uri:
+        url: '{{ gitea_api_url }}/users/{{ gitea_user_admin_username }}/tokens/CONTAINER_REGISTRY_PUSH_TOKEN'
+        method: DELETE
+        url_username: '{{ gitea_user_admin_username }}'
+        url_password: '{{ gitea_user_admin_password }}'
+        force_basic_auth: true
+        status_code: [204, 404]
+    - name: create token new
+      ansible.builtin.uri:
+        url: '{{ gitea_api_url }}/users/{{ gitea_user_admin_username }}/tokens'
+        method: POST
+        url_username: '{{ gitea_user_admin_username }}'
+        url_password: '{{ gitea_user_admin_password }}'
+        force_basic_auth: true
+        body: '{ "name": "CONTAINER_REGISTRY_PUSH_TOKEN", "scopes": ["write:package"] }'
+        body_format: json
+        status_code: [201]
+        return_content: yes
+      register: gitea_admin_container_registry_push_token
+  - name: add write PAT to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/PAT_REGISTRY_PUSH'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ gitea_admin_container_registry_push_token.json.sha1 }}" }'
+      body_format: json
+      status_code: [201, 204]
+
+  - name: add ssh key for 'homepage' to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/SSH_KEY_HOMEPAGE'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ lookup("ansible.builtin.unvault", "ssh-keys/ssh-key-homepage") | string | trim }}" }'
+      body_format: json
+      status_code: [201, 204]
+  - name: add ssh key for 'prod' to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/SSH_KEY_PROD'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ lookup("ansible.builtin.unvault", "ssh-keys/ssh-key-prod") | string | trim }}" }'
+      body_format: json
+      status_code: [201, 204]
+  - name: add ssh user for 'prod' to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/SSH_USER_PROD'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ prod_ssh_user }}" }'
+      body_format: json
+      status_code: [201, 204]
+  - name: add ssh port for 'prod' to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/SSH_PORT_PROD'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ prod_ssh_port }}" }'
+      body_format: json
+      status_code: [201, 204]
+  - name: add mailing password for 'prod' to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/MAILING_PASSWORD_PROD'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ gites_mailer_password }}" }'
+      body_format: json
+      status_code: [201, 204]
+  - name: add postgres password for 'prod' to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/POSTGRES_PASSWORD_PROD'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ vault_postgres_pw }}" }'
+      body_format: json
+      status_code: [201, 204]
+
+  - name: add slack token of 'gitea' app to abc-org secrets
+    ansible.builtin.uri:
+      url: '{{ gitea_api_url }}/orgs/abc-org/actions/secrets/SLACK_TOKEN'
+      method: PUT
+      url_username: '{{ gitea_user_admin_username }}'
+      url_password: '{{ gitea_user_admin_password }}'
+      force_basic_auth: true
+      body: '{ "data": "{{ gitea_slack_token }}" }'
+      body_format: json
+      status_code: [201, 204]

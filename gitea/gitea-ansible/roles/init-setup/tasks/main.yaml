@@ -1,0 +1,50 @@
+---
+- name: Install required system packages
+  apt: name={{ item }} state=latest update_cache=yes
+  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+- name: Install required python package for nginx setup
+  shell:
+    cmd: python3 -m pip install requests
+
+- name: setup docker
+  include_tasks: setup-docker.yaml
+
+- name: prepare nginx setup
+  include_tasks: pre-nginx-setup.yaml
+
+- name: nginx setup from ims
+  include_tasks: '{{ shared_tasks }}/nginx/nginx.yml'
+
+- name: ims db postgres setup
+  include_tasks: '{{ shared_tasks }}/postgres.yml'
+
+- name: create userdefined docker network
+  community.docker.docker_network:
+    name: '{{ docker_network_name }}'
+    connected:
+      - "{{ postgres_container_name }}"
+    appends: yes
+
+- name: setup gitea with database
+  include_tasks: gitea-with-db.yaml
+
+- name: setup initial gitea runner
+  include_tasks: gitea-runner.yaml
+
+- name: setup dependencies for gitea runners, used in workflows etc.
+  include_tasks: gitea-runner-dependencies.yaml
+
+# if included, then also include gitea-config-api.yaml or add new sonar token manually
+- include_tasks: sonarqube.yaml
+
+# check file for include
+- include_tasks: gitea-config-api.yaml
+
+- name: add backup configuration
+  include_tasks: gitea-backup.yaml
+  tags:
+  - do-gitea-backup
+
+- name: common cleanup
+  include_tasks: cleanup.yaml

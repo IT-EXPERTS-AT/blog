@@ -1,0 +1,33 @@
+---
+- name: create backup target directory
+  file:
+    path: '{{ host_backup_target_directory }}'
+    state: directory
+    owner: '{{ ansible_user }}'
+  tags:
+  - do-gitea-backup
+
+- name: copy over backup shell script
+  template:
+    src: backup.sh.j2
+    dest: '{{ destination_directory_gitea }}/backup.sh'
+    mode: +x
+  tags:
+  - do-gitea-backup
+
+- name: create backup directory inside gitea docker container
+  community.docker.docker_container_exec:
+    container: '{{ docker_container_name_gitea }}'
+    command: /bin/bash -c "mkdir -p /tmp/backup"
+  tags:
+  - do-gitea-backup
+
+- name: create daily cron with job backup.sh
+  ansible.builtin.cron:
+    name: 'backup gitea'
+    hour: '0'
+    minute: '0'
+    job: '{{ destination_directory_gitea }}/backup.sh >> /var/log/gitea-backup.log 2>&1'
+    user: root
+  tags:
+  - do-gitea-backup
