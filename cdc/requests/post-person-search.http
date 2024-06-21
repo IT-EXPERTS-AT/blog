@@ -1,0 +1,19 @@
+# curl --location 'http://localhost:9200/dbserver1.public.person/_search?pretty=null'
+#--header 'Content-Type: application/json'
+#--data '{
+#  "query": {
+#    "match": {
+#      "first_name": "hansi"
+#    }
+#  }
+#}'
+POST http://localhost:9200/dbserver1.public.person/_search?pretty=null
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "first_name": "hansi"
+    }
+  }
+}
