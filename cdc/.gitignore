@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/confluentinc-kafka-connect-elasticsearch-14.0.14
+confluentinc-kafka-connect-elasticsearch-14.0.14.zip

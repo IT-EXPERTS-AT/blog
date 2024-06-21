@@ -47,3 +47,5 @@ services:
       - CONFIG_STORAGE_TOPIC=my_connect_configs
       - OFFSET_STORAGE_TOPIC=my_connect_offsets
       - STATUS_STORAGE_TOPIC=my_connect_statuses
+    volumes:
+      - ./confluentinc-kafka-connect-elasticsearch-14.0.14/lib:/kafka/connect/kafka-connect-jdbc
