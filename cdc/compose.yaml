@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=cdc'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    ports:
+      - 5432:5432
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+  zookeeper:
+    image: quay.io/debezium/zookeeper:2.6
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+  kafka:
+    image: quay.io/debezium/kafka:2.6
+    ports:
+      - 9092:9092
+    links:
+      - zookeeper
+    environment:
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+  elastic:
+    image: elasticsearch:8.13.0
+    ports:
+      - 9200:9200
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - xpack.security.enabled=false
+  connect:
+    image: quay.io/debezium/connect:2.6
+    ports:
+      - 8083:8083
+    links:
+      - kafka
+      - postgres
+      - elastic
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+    volumes:
+      - ./confluentinc-kafka-connect-elasticsearch-14.0.14/lib:/kafka/connect/kafka-connect-jdbc

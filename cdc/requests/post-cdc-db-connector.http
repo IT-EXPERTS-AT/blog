@@ -1,0 +1,18 @@
+POST http://localhost:8083/connectors
+Content-Type: application/json
+
+{
+  "name": "cdc-db-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "myuser",
+    "database.password": "secret",
+    "database.dbname": "cdc",
+    "topic.prefix": "dbserver1",
+    "schema.include.list": "public",
+    "plugin.name": "pgoutput"
+  }
+}

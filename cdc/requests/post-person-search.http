@@ -1,0 +1,10 @@
+POST http://localhost:9200/dbserver1.public.person/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "first_name": "John"
+    }
+  }
+}
