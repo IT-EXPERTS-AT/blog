@@ -1,3 +1,4 @@
+# Register the Elasticsearch Sink connector in Kafka Connect
 POST http://localhost:8083/connectors
 Content-Type: application/json
 
