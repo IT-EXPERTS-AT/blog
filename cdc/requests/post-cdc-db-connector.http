@@ -1,3 +1,4 @@
+# Register the Debezium connector in Kafka Connect for our Postgres database
 POST http://localhost:8083/connectors
 Content-Type: application/json
 
