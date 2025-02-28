@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=cinema'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=cinema'
+    ports:
+      - '5432:5432'
+  zipkin:
+    image: 'openzipkin/zipkin:latest'
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - '9411:9411'
