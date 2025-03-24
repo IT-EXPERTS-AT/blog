@@ -11,7 +11,7 @@ import com.github.javafaker.Faker;
 @Component
 public class PersonSeeder {
 
-    private static final int NUMBER_OF_PERSONS = 1_000;
+    private static final int NUMBER_OF_PERSONS = 100;
 
     private final PersonRepository personRepository;
     private final Faker faker = new Faker();
