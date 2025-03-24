@@ -4,7 +4,7 @@ Content-Type: application/json
 {
   "query": {
     "match": {
-      "first_name": "Claud"
+      "first_name": "Hannelore"
     }
   }
 }

@@ -25,14 +25,6 @@ services:
       - zookeeper
     environment:
       - ZOOKEEPER_CONNECT=zookeeper:2181
-  elastic:
-    image: elasticsearch:8.13.0
-    ports:
-      - 9200:9200
-    environment:
-      - http.host=0.0.0.0
-      - transport.host=127.0.0.1
-      - xpack.security.enabled=false
   connect:
     image: quay.io/debezium/connect:2.6
     ports:
@@ -49,3 +41,11 @@ services:
       - STATUS_STORAGE_TOPIC=my_connect_statuses
     volumes:
       - ./confluentinc-kafka-connect-elasticsearch-14.0.14/lib:/kafka/connect/kafka-connect-jdbc
+  elastic:
+    image: elasticsearch:8.13.0
+    ports:
+      - 9200:9200
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - xpack.security.enabled=false

@@ -1,1 +1,1 @@
-GET http://localhost:9200/dbserver1.public.person
+GET http://localhost:9200/dbserver1.public.person/_stats
