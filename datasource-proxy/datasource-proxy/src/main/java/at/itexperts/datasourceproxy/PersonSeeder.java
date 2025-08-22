@@ -1,32 +1,30 @@
 package at.itexperts.datasourceproxy;
 
+import com.github.javafaker.Faker;
 import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
-
-import com.github.javafaker.Faker;
-import jakarta.annotation.PostConstruct;
 
 @Component
 public class PersonSeeder {
 
-    private static final int NUMBER_OF_PERSONS = 1_000;
+  private static final int NUMBER_OF_PERSONS = 1_000;
 
-    private final PersonRepository personRepository;
-    private final Faker faker = new Faker();
+  private final PersonRepository personRepository;
 
-    public PersonSeeder(PersonRepository personRepository) {
-        this.personRepository = personRepository;
-    }
+  private final Faker faker = new Faker();
 
-    @PostConstruct
-    public void init() {
-        IntStream.range(0, NUMBER_OF_PERSONS).forEach(i -> personRepository.save(createRandomPerson()));
-    }
+  public PersonSeeder(PersonRepository personRepository) {
+    this.personRepository = personRepository;
+  }
 
-    private Person createRandomPerson() {
-        Person person = new Person();
-        person.setFirstName(faker.name().firstName());
-        person.setLastName(faker.name().lastName());
-        return person;
-    }
+  public void seed() {
+    IntStream.range(0, NUMBER_OF_PERSONS).forEach(i -> personRepository.save(createRandomPerson()));
+  }
+
+  private Person createRandomPerson() {
+    var person = new Person();
+    person.setFirstName(faker.name().firstName());
+    person.setLastName(faker.name().lastName());
+    return person;
+  }
 }
