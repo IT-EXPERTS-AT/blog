@@ -33,7 +33,7 @@ public class QueryTracker extends DataSourceQueryCountListener {
     this.queryTypes.addAll(typesToTrack);
   }
 
-  private void clear() {
+  public void clear() {
     ((SingleQueryCountHolder) getQueryCountStrategy()).clear();
     this.queryTypes.clear();
     this.queries.clear();
@@ -65,19 +65,46 @@ public class QueryTracker extends DataSourceQueryCountListener {
     }
   }
 
-  public AbstractLongAssert<?> assertInsertIntoCount(String tableName) {
+  private AbstractLongAssert<?> assertQueryCount(QueryType type, String tableName) {
     return assertThat(
-        queries.getOrDefault(QueryType.INSERT, List.of()).stream()
-            .filter(isInsertIntoTable(tableName))
+        queries.getOrDefault(type, List.of()).stream()
+            .filter(getTablePredicate(type, tableName))
             .count());
   }
 
-  private static Predicate<ParsedQuery> isInsertIntoTable(String tableName) {
+  private static Predicate<ParsedQuery> getTablePredicate(QueryType type, String tableName) {
     return parsedQuery -> {
-      if (parsedQuery.statement() instanceof net.sf.jsqlparser.statement.insert.Insert insert) {
-        return insert.getTable().getName().equalsIgnoreCase(tableName);
+      switch (type) {
+        case INSERT -> {
+          if (parsedQuery.statement() instanceof net.sf.jsqlparser.statement.insert.Insert insert) {
+            return insert.getTable().getName().equalsIgnoreCase(tableName);
+          }
+        }
+        case DELETE -> {
+          if (parsedQuery.statement() instanceof net.sf.jsqlparser.statement.delete.Delete delete) {
+            return delete.getTable().getName().equalsIgnoreCase(tableName);
+          }
+        }
+        case UPDATE -> {
+          if (parsedQuery.statement() instanceof net.sf.jsqlparser.statement.update.Update update) {
+            return update.getTable().getName().equalsIgnoreCase(tableName);
+          }
+        }
+        default -> throw new IllegalArgumentException("Not supported for type: " + type);
       }
       return false;
     };
+  }
+
+  public AbstractLongAssert<?> assertInsertIntoCount(String tableName) {
+    return assertQueryCount(QueryType.INSERT, tableName);
+  }
+
+  public AbstractLongAssert<?> assertDeleteCount(String tableName) {
+    return assertQueryCount(QueryType.DELETE, tableName);
+  }
+
+  public AbstractLongAssert<?> assertUpdateCount(String tableName) {
+    return assertQueryCount(QueryType.UPDATE, tableName);
   }
 }
