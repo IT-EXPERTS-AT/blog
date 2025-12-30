@@ -20,15 +20,14 @@ public class CourseAgent {
    public MarketingText generateText(Course course, OperationContext context) {
       var shouldReplacePrompt = RANDOM.nextDouble() < 0.2;
       var prompt = """
-            Create a catching marketing text for the following sport course:
-            Type: %s, Level: %s, Duration: %s, Location: %s
-            """.formatted(
-            course.sport(), course.level(), course.durationInHours(), course.location());
+            Create a catching marketing text for the sport course.
+            """;
 
       var wrongPrompt = "Write a short story";
 
       return context.ai()
             .withDefaultLlm()
+            .withToolObject(course)
             .createObject(shouldReplacePrompt ? wrongPrompt : prompt, MarketingText.class);
    }
 
