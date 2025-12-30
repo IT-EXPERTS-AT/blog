@@ -19,9 +19,7 @@ public class CourseAgent {
    @Action
    public MarketingText generateText(Course course, OperationContext context) {
       var shouldReplacePrompt = RANDOM.nextDouble() < 0.2;
-      var prompt = """
-            Create a catching marketing text for the sport course.
-            """;
+      var prompt = "Create a catchy marketing text for the sport course.";
 
       var wrongPrompt = "Write a short story";
 
@@ -50,7 +48,7 @@ public class CourseAgent {
       if (marketingText.passedReview()) {
          courseRepository.updateMarketingText(course.id(), marketingText.text());
       } else {
-         courseRepository.updateMarketingText(course.id(), "No text available. Generated Text failed review");
+         courseRepository.updateMarketingText(course.id(), "No text available. Generated text failed review");
       }
       return new NoResult();
    }

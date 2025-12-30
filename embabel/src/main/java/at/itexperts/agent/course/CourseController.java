@@ -1,5 +1,6 @@
 package at.itexperts.agent.course;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,8 @@ public class CourseController {
    @PostMapping()
    public Long createCourse(@RequestBody Course course) {
       Course saved = courseRepository.save(course);
-      Agent agent = agentPlatform.agents().getFirst();
+      List<Agent> agents = agentPlatform.agents();
+      Agent agent = agents.stream().filter(a -> a.getName().contains("Course")).findFirst().orElseThrow();
       AgentProcess agentProcess = agentPlatform.createAgentProcess(agent, ProcessOptions.DEFAULT, Map.of("course", saved));
       agentPlatform.start(agentProcess);
       return saved.id();
