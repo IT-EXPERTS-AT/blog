@@ -1,0 +1,11 @@
+POST http://localhost:8080/course
+Content-Type: application/json
+
+{
+  "sport": "volleyball",
+  "level": "expert",
+  "durationInHours": 2,
+  "location": "Vienna"
+}
+
+###
