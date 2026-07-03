@@ -1,0 +1,30 @@
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Environment / secrets
+.env
+*.env
+!.env.example
+
+# Generated PDFs
+output/
+
+# Prefect project-local state
+.prefect/
+
+# Vendor stacks — readers clone Dify / Opik here; contents never committed
+# (the folder itself is kept via vendor/.gitkeep)
+vendor/*
+!vendor/.gitkeep
+
+# Mac
+.DS_Store

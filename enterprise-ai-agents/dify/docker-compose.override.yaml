@@ -1,0 +1,43 @@
+# Layered onto the official Dify compose (vendor/dify/docker/docker-compose.yaml).
+#
+# Adds two dedicated Postgres databases for the BI agent — both kept separate
+# from Dify's own internal Postgres:
+#   - sources-db: read-only demo data (seeded from shared/sources_seed.sql)
+#   - memory-db:  agent lesson memory
+#
+# Usage (see README "Approach A — Dify"):
+#   1. Copy this file, shared/memory_schema.sql, and shared/sources_seed.sql
+#      into vendor/dify/docker/
+#   2. From vendor/dify/docker/:  docker compose up
+#
+# Both schemas/seeds are auto-applied on first start.
+services:
+  sources-db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: reader
+      POSTGRES_PASSWORD: reader
+      POSTGRES_DB: sources
+    ports:
+      - "5435:5432"
+    volumes:
+      - sources-db:/var/lib/postgresql/data
+      - ./sources_seed.sql:/docker-entrypoint-initdb.d/sources_seed.sql:ro
+
+  memory-db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: agent
+      POSTGRES_DB: memory
+    ports:
+      - "5434:5432"
+    volumes:
+      - memory-db:/var/lib/postgresql/data
+      - ./memory_schema.sql:/docker-entrypoint-initdb.d/memory_schema.sql:ro
+
+volumes:
+  sources-db:
+  memory-db:

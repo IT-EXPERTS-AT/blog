@@ -1,0 +1,4 @@
+# Extra packages for Dify code nodes, installed by the sandbox on startup.
+# Copy to vendor/dify/docker/volumes/sandbox/dependencies/python-requirements.txt
+# then restart the sandbox:  docker compose restart sandbox
+fpdf2==2.8.7

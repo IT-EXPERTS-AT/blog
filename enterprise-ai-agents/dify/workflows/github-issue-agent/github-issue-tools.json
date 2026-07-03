@@ -1,0 +1,110 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GitHub issue tools",
+    "description": "Retrieves a single GitHub issue and its comments by issue number.",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.github.com"
+    }
+  ],
+  "paths": {
+    "/repos/{owner}/{repo}/issues/{issue_number}": {
+      "get": {
+        "description": "Get a single issue by number, including its full body, state, labels, and metadata",
+        "operationId": "GetIssue",
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The account owner of the repository (e.g. IT-EXPERTS-AT)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repository (e.g. tagger)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issue_number",
+            "in": "path",
+            "description": "The number that identifies the issue",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested issue"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/repos/{owner}/{repo}/issues/{issue_number}/comments": {
+      "get": {
+        "description": "List all comments on a single issue, including each comment's author and body text",
+        "operationId": "GetIssueComments",
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The account owner of the repository (e.g. IT-EXPERTS-AT)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repository (e.g. tagger)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issue_number",
+            "in": "path",
+            "description": "The number that identifies the issue",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of results per page (max 100)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The list of comments on the issue"
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  }
+}

@@ -1,0 +1,11 @@
+# Project-local Prefect client config. Run the bi-agent commands from this
+# directory so these settings apply.
+#
+# `home` keeps the client's scaffolding (profiles, caches) inside ./.prefect
+# instead of ~/.prefect — Prefect never writes to your home folder. The actual
+# server state lives in Docker (see docker-compose.yml).
+home = ".prefect"
+
+# Point the client (CLI + flow runs) at the Dockerized Prefect server.
+[api]
+url = "http://127.0.0.1:4200/api"

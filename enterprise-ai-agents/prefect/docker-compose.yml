@@ -1,0 +1,115 @@
+# Project-scoped infrastructure for Approach B — runs in Docker so nothing
+# touches your host. The agent itself runs on the host via `uv` (see README).
+#
+#   docker compose up -d        # start server + both DBs
+#   docker compose logs -f      # follow logs
+#   docker compose down         # stop (keeps data)
+#   docker compose down -v      # stop AND wipe all data
+#
+# All Prefect state (runs, deployments, artifacts) lives in the `prefect-data`
+# volume, isolated from your machine's ~/.prefect.
+services:
+  prefect-server:
+    image: prefecthq/prefect:3.7.6-python3.12
+    command: prefect server start --host 0.0.0.0
+    ports:
+      - "4200:4200"
+    environment:
+      PREFECT_HOME: /data
+      PREFECT_API_DATABASE_CONNECTION_URL: sqlite+aiosqlite:////data/prefect.db
+    volumes:
+      - prefect-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4200/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Source data — same rows as the Dify sources-db, seeded from the
+  # shared SQL file. Exposed on localhost:5436.
+  sources-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: reader
+      POSTGRES_PASSWORD: reader
+      POSTGRES_DB: sources
+    ports:
+      - "5436:5432"
+    volumes:
+      - sources-db:/var/lib/postgresql/data
+      - ../shared/sources_seed.sql:/docker-entrypoint-initdb.d/sources_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reader -d sources"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Dedicated memory Postgres for the agent — separate from anything Prefect
+  # uses. The schema is auto-applied from the shared blueprint on first start.
+  # Exposed on localhost:5433 so the host-run agent can reach it.
+  memory-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: agent
+      POSTGRES_DB: memory
+    ports:
+      - "5433:5432"
+    volumes:
+      - memory-db:/var/lib/postgresql/data
+      - ../shared/memory_schema.sql:/docker-entrypoint-initdb.d/memory_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent -d memory"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Secondary path: serve an agent from a container instead of your CLI.
+  # Each agent has its own image and its own profile, so you start only the
+  # one you want:
+  #   docker compose --profile bi-agent     up -d --build
+  #   docker compose --profile github-agent up -d --build
+  bi-agent-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.bi-agent
+    profiles: ["bi-agent"]
+    env_file: .env
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+      SOURCES_DSN: postgresql://reader:reader@sources-db:5432/sources
+      MEMORY_DSN: postgresql://agent:agent@memory-db:5432/memory
+      OUTPUT_DIR: /app/output
+      OPIK_URL_OVERRIDE: http://host.docker.internal:5173/api
+    volumes:
+      - ./output:/app/output
+    depends_on:
+      prefect-server:
+        condition: service_healthy
+      sources-db:
+        condition: service_healthy
+      memory-db:
+        condition: service_healthy
+
+  # The GitHub agent talks only to the GitHub API — no Postgres. It needs
+  # GITHUB_TOKEN (from .env) and the Prefect server.
+  github-agent-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.github-agent
+    profiles: ["github-agent"]
+    env_file: .env
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+      OPIK_URL_OVERRIDE: http://host.docker.internal:5173/api
+    depends_on:
+      prefect-server:
+        condition: service_healthy
+
+volumes:
+  prefect-data:
+  sources-db:
+  memory-db:
