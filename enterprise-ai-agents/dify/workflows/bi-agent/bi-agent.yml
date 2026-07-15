@@ -1,0 +1,1238 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: workflow
+  name: BI Agent
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/azure_openai:0.0.60@8308f8046f1d6fad5be3cd3741a531cec8d4925a7413c98a0e6f0fc9e74e872a
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: hjlarry/database:0.0.6@534bc26cf5bc4ff6b5557457452287ccc71f00eef9378784c4f43ca49954ca2f
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: kurokobo/file_tools:0.0.2@8bde7b4d2c30cf22e8f6ce851572af244f7a5776addab94330b820dc2160726c
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/agent:0.0.40@d00a70e81bfb28fadd52cba7fd7a1f7c344c67b051e4a2e356a06c690736a7c4
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: agent
+      id: 1782812453546-source-1782811838044-target
+      source: '1782812453546'
+      sourceHandle: source
+      target: '1782811838044'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: agent
+      id: 1782811937869-source-1782811838044-target
+      source: '1782811937869'
+      sourceHandle: source
+      target: '1782811838044'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: trigger-schedule
+        targetType: tool
+      id: 1783074906726-source-1782811937869-target
+      source: '1783074906726'
+      sourceHandle: source
+      target: '1782811937869'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: trigger-schedule
+        targetType: tool
+      id: 1783074906726-source-1782812453546-target
+      source: '1783074906726'
+      sourceHandle: source
+      target: '1782812453546'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: llm
+      id: 1782811838044-source-1782820733717-target
+      source: '1782811838044'
+      sourceHandle: source
+      target: '1782820733717'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1782820733717-source-1782821805426-target
+      source: '1782820733717'
+      sourceHandle: source
+      target: '1782821805426'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: 1782821805426-source-1782813297942-target
+      source: '1782821805426'
+      sourceHandle: source
+      target: '1782813297942'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: tool
+      id: 1782821805426-source-1782822990420-target
+      source: '1782821805426'
+      sourceHandle: source
+      target: '1782822990420'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        config:
+          frequency: daily
+          mode: visual
+          timezone: UTC
+          visual_config:
+            monthly_days:
+            - 1
+            on_minute: 0
+            time: 12:00 AM
+            weekdays:
+            - sun
+        frequency: daily
+        mode: visual
+        selected: false
+        timezone: America/New_York
+        title: Schedule Trigger
+        type: trigger-schedule
+        visual_config:
+          monthly_days:
+          - 1
+          on_minute: 0
+          time: 7:00 AM
+          weekdays:
+          - sun
+      height: 130
+      id: '1783074906726'
+      position:
+        x: 0
+        y: 62.99999999999997
+      positionAbsolute:
+        x: 0
+        y: 62.99999999999997
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: 'You are a business intelligence agent. Once a day you review the
+              company''s data sources and produce a short, factual report on what
+              changed.
+
+
+              You have tools to:
+
+              - get the schema of the available data sources,
+
+              - run read-only SQL queries against them,
+
+              - save a lesson for your future self.
+
+
+              Work like this:
+
+              1. Discover the available sources and the latest date present in them,
+              then query that most-recent period. The data may lag behind today by
+              a day or more — always report on the latest available data, never on
+              an empty "today", and never produce a report full of zeros because a
+              given day has no rows.
+
+              2. Produce a BI report: a title, the period covered, a 2-4 sentence
+              executive summary, the headline metrics, the notable insights (changes,
+              anomalies, trends), and a few recommendations. Be specific and use numbers.
+
+              3. Only if you found a genuine, reusable insight — a recurring anomaly,
+              a data-quality caveat, something your future self should know — save
+              exactly one short lesson (1-3 sentences) with the append lesson tool.
+              If the run was clean and there is nothing noteworthy, do not save anything.
+
+
+              When you call a database tool such as get-table-schema, do not fill
+              in any parameters — leave every input empty so it returns all tables
+              and columns. Filling parameters will filter, narrow, or break the result.
+
+
+              Lessons from previous runs:
+
+              {{#1782811937869.text#}}'
+          maximum_iterations:
+            type: constant
+            value: 10
+          model:
+            type: constant
+            value:
+              completion_params: {}
+              mode: chat
+              model: gpt-5.1
+              model_type: llm
+              provider: langgenius/azure_openai/azure_openai
+              type: model-selector
+          query:
+            type: constant
+            value: Today is {{#1782812453546.text#}}. The source data may lag behind
+              today. Analyze the most recent date available in the data (which may
+              be earlier than today) and produce the daily BI report for that period.
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: This tool is used to get the table schema from the database.
+              parameters:
+                db_uri:
+                  auto: 1
+                  value: null
+                tables:
+                  auto: 1
+                  value: null
+              plugin_id: hjlarry/database
+              provider_name: hjlarry/database/database
+              provider_show_name: hjlarry/database/database
+              settings:
+                config_options:
+                  value:
+                    type: mixed
+                    value: null
+                schema:
+                  value:
+                    type: mixed
+                    value: null
+              tool_description: get the table schema from the database.
+              tool_label: Get Table Schema
+              tool_name: table_schema
+              type: builtin
+            - enabled: true
+              extra:
+                description: This tool is used to execute SQL in an existing database.
+              parameters:
+                db_uri:
+                  auto: 1
+                  value: null
+                query:
+                  auto: 1
+                  value: null
+              plugin_id: hjlarry/database
+              provider_name: hjlarry/database/database
+              provider_show_name: hjlarry/database/database
+              settings:
+                config_options:
+                  value:
+                    type: mixed
+                    value: null
+                format:
+                  value:
+                    type: constant
+                    value: json
+              tool_description: This tool is used to execute SQL in an existing database.
+              tool_label: SQL Execute
+              tool_name: sql_execute
+              type: builtin
+            - enabled: true
+              extra:
+                description: Append a single lesson to memory.
+              parameters:
+                lesson:
+                  auto: 1
+                  value: null
+              plugin_id: null
+              provider_name: 6e930dcc-404d-4f93-bb54-13072cadc550
+              provider_show_name: Append Lesson
+              settings: {}
+              tool_description: Append a single lesson to memory.
+              tool_label: Append Lesson
+              tool_name: append_lesson
+              type: workflow
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        meta:
+          minimum_dify_version: 1.7.0
+          version: 0.0.2
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.40@d00a70e81bfb28fadd52cba7fd7a1f7c344c67b051e4a2e356a06c690736a7c4
+        selected: false
+        title: Agent
+        tool_node_version: '2'
+        type: agent
+      height: 188
+      id: '1782811838044'
+      position:
+        x: 724
+        y: 79
+      positionAbsolute:
+        x: 724
+        y: 79
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: false
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The SQL query string.
+            ja_JP: The SQL query string.
+            pt_BR: The SQL query string.
+            zh_Hans: SQL 查询语句。
+          label:
+            en_US: SQL Query
+            ja_JP: SQL Query
+            pt_BR: SQL Query
+            zh_Hans: SQL 查询语句
+          llm_description: The SQL query string.
+          max: null
+          min: null
+          name: query
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Optional, Filling in this field will overwrite the database connection
+              entered during authorization.
+            ja_JP: Optional, Filling in this field will overwrite the database connection
+              entered during authorization.
+            pt_BR: Optional, Filling in this field will overwrite the database connection
+              entered during authorization.
+            zh_Hans: 选填，填写后将覆盖授权时填写的数据库连接。
+          label:
+            en_US: DB URI
+            ja_JP: DB URI
+            pt_BR: DB URI
+            zh_Hans: DB URI
+          llm_description: ''
+          max: null
+          min: null
+          name: db_uri
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: json
+          form: form
+          human_description:
+            en_US: Choose the output format.
+            ja_JP: Choose the output format.
+            pt_BR: Choose the output format.
+            zh_Hans: 选择输出格式。
+          label:
+            en_US: Output format
+            ja_JP: Output format
+            pt_BR: Output format
+            zh_Hans: 输出格式
+          llm_description: ''
+          max: null
+          min: null
+          name: format
+          options:
+          - icon: ''
+            label:
+              en_US: JSON
+              ja_JP: JSON
+              pt_BR: JSON
+              zh_Hans: JSON
+            value: json
+          - icon: ''
+            label:
+              en_US: CSV
+              ja_JP: CSV
+              pt_BR: CSV
+              zh_Hans: CSV
+            value: csv
+          - icon: ''
+            label:
+              en_US: YAML
+              ja_JP: YAML
+              pt_BR: YAML
+              zh_Hans: YAML
+            value: yaml
+          - icon: ''
+            label:
+              en_US: Markdown
+              ja_JP: Markdown
+              pt_BR: Markdown
+              zh_Hans: Markdown
+            value: md
+          - icon: ''
+            label:
+              en_US: Excel
+              ja_JP: Excel
+              pt_BR: Excel
+              zh_Hans: Excel
+            value: xlsx
+          - icon: ''
+            label:
+              en_US: HTML
+              ja_JP: HTML
+              pt_BR: HTML
+              zh_Hans: HTML
+            value: html
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        - auto_generate: null
+          default: null
+          form: form
+          human_description:
+            en_US: 'Optional. For example {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
+
+              More connection options can be found at https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
+
+              '
+            ja_JP: 'Optional. For example {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
+
+              More connection options can be found at https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
+
+              '
+            pt_BR: 'Optional. For example {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
+
+              More connection options can be found at https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
+
+              '
+            zh_Hans: '选填项。例如 {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
+
+              更多连接选项可参考 https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
+
+              '
+          label:
+            en_US: DB Config Options
+            ja_JP: DB Config Options
+            pt_BR: DB Config Options
+            zh_Hans: 数据库连接配置选项
+          llm_description: ''
+          max: null
+          min: null
+          name: config_options
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          config_options: ''
+          db_uri: ''
+          format: ''
+          query: ''
+        plugin_id: hjlarry/database
+        plugin_unique_identifier: hjlarry/database:0.0.6@534bc26cf5bc4ff6b5557457452287ccc71f00eef9378784c4f43ca49954ca2f
+        provider_icon: /console/api/workspaces/current/plugin/icon?tenant_id=c56dfadf-5413-4c2e-af8c-93105d7399b5&filename=65d2d7404efb4952bb715a35ae79ccce92e70b820fd6cdb74e9acc58a505f7cf.svg
+        provider_id: hjlarry/database/database
+        provider_name: hjlarry/database/database
+        provider_show_name: Database
+        provider_type: builtin
+        selected: false
+        title: SQL Execute (Fetch Lessons)
+        tool_configurations:
+          config_options:
+            type: mixed
+            value: null
+          format:
+            type: constant
+            value: json
+        tool_description: This tool is used to execute SQL in an existing database.
+        tool_label: SQL Execute
+        tool_name: sql_execute
+        tool_node_version: '2'
+        tool_parameters:
+          db_uri:
+            type: mixed
+            value: null
+          query:
+            type: mixed
+            value: select lesson from lessons order by created_at desc limit 20
+        type: tool
+      height: 114
+      id: '1782811937869'
+      position:
+        x: 362
+        y: 0
+      positionAbsolute:
+        x: 362
+        y: 0
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: '%Y-%m-%d %H:%M:%S'
+          form: form
+          human_description:
+            en_US: Time format in strftime standard.
+            ja_JP: Time format in strftime standard.
+            pt_BR: Time format in strftime standard.
+            zh_Hans: strftime 标准的时间格式。
+          label:
+            en_US: Format
+            ja_JP: Format
+            pt_BR: Format
+            zh_Hans: 格式
+          llm_description: null
+          max: null
+          min: null
+          name: format
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: UTC
+          form: form
+          human_description:
+            en_US: Timezone
+            ja_JP: Timezone
+            pt_BR: Timezone
+            zh_Hans: 时区
+          label:
+            en_US: Timezone
+            ja_JP: Timezone
+            pt_BR: Timezone
+            zh_Hans: 时区
+          llm_description: null
+          max: null
+          min: null
+          name: timezone
+          options:
+          - icon: null
+            label:
+              en_US: UTC
+              ja_JP: UTC
+              pt_BR: UTC
+              zh_Hans: UTC
+            value: UTC
+          - icon: null
+            label:
+              en_US: America/New_York
+              ja_JP: America/New_York
+              pt_BR: America/New_York
+              zh_Hans: 美洲/纽约
+            value: America/New_York
+          - icon: null
+            label:
+              en_US: America/Los_Angeles
+              ja_JP: America/Los_Angeles
+              pt_BR: America/Los_Angeles
+              zh_Hans: 美洲/洛杉矶
+            value: America/Los_Angeles
+          - icon: null
+            label:
+              en_US: America/Chicago
+              ja_JP: America/Chicago
+              pt_BR: America/Chicago
+              zh_Hans: 美洲/芝加哥
+            value: America/Chicago
+          - icon: null
+            label:
+              en_US: America/Sao_Paulo
+              ja_JP: America/Sao_Paulo
+              pt_BR: América/São Paulo
+              zh_Hans: 美洲/圣保罗
+            value: America/Sao_Paulo
+          - icon: null
+            label:
+              en_US: Asia/Shanghai
+              ja_JP: Asia/Shanghai
+              pt_BR: Asia/Shanghai
+              zh_Hans: 亚洲/上海
+            value: Asia/Shanghai
+          - icon: null
+            label:
+              en_US: Asia/Ho_Chi_Minh
+              ja_JP: Asia/Ho_Chi_Minh
+              pt_BR: Ásia/Ho Chi Minh
+              zh_Hans: 亚洲/胡志明市
+            value: Asia/Ho_Chi_Minh
+          - icon: null
+            label:
+              en_US: Asia/Tokyo
+              ja_JP: Asia/Tokyo
+              pt_BR: Asia/Tokyo
+              zh_Hans: 亚洲/东京
+            value: Asia/Tokyo
+          - icon: null
+            label:
+              en_US: Asia/Dubai
+              ja_JP: Asia/Dubai
+              pt_BR: Asia/Dubai
+              zh_Hans: 亚洲/迪拜
+            value: Asia/Dubai
+          - icon: null
+            label:
+              en_US: Asia/Kolkata
+              ja_JP: Asia/Kolkata
+              pt_BR: Asia/Kolkata
+              zh_Hans: 亚洲/加尔各答
+            value: Asia/Kolkata
+          - icon: null
+            label:
+              en_US: Asia/Seoul
+              ja_JP: Asia/Seoul
+              pt_BR: Asia/Seoul
+              zh_Hans: 亚洲/首尔
+            value: Asia/Seoul
+          - icon: null
+            label:
+              en_US: Asia/Singapore
+              ja_JP: Asia/Singapore
+              pt_BR: Asia/Singapore
+              zh_Hans: 亚洲/新加坡
+            value: Asia/Singapore
+          - icon: null
+            label:
+              en_US: Europe/London
+              ja_JP: Europe/London
+              pt_BR: Europe/London
+              zh_Hans: 欧洲/伦敦
+            value: Europe/London
+          - icon: null
+            label:
+              en_US: Europe/Berlin
+              ja_JP: Europe/Berlin
+              pt_BR: Europe/Berlin
+              zh_Hans: 欧洲/柏林
+            value: Europe/Berlin
+          - icon: null
+            label:
+              en_US: Europe/Moscow
+              ja_JP: Europe/Moscow
+              pt_BR: Europe/Moscow
+              zh_Hans: 欧洲/莫斯科
+            value: Europe/Moscow
+          - icon: null
+            label:
+              en_US: Australia/Sydney
+              ja_JP: Australia/Sydney
+              pt_BR: Australia/Sydney
+              zh_Hans: 澳大利亚/悉尼
+            value: Australia/Sydney
+          - icon: null
+            label:
+              en_US: Pacific/Auckland
+              ja_JP: Pacific/Auckland
+              pt_BR: Pacific/Auckland
+              zh_Hans: 太平洋/奥克兰
+            value: Pacific/Auckland
+          - icon: null
+            label:
+              en_US: Africa/Cairo
+              ja_JP: Africa/Cairo
+              pt_BR: Africa/Cairo
+              zh_Hans: 非洲/开罗
+            value: Africa/Cairo
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        params:
+          format: ''
+          timezone: ''
+        plugin_id: null
+        plugin_unique_identifier: ''
+        provider_icon: /console/api/workspaces/current/tool-provider/builtin/time/icon
+        provider_id: time
+        provider_name: time
+        provider_show_name: CurrentTime
+        provider_type: builtin
+        selected: false
+        title: Current Time
+        tool_configurations:
+          format:
+            type: mixed
+            value: '%Y-%m-%d %H:%M:%S'
+          timezone:
+            type: constant
+            value: UTC
+        tool_description: A tool for getting the current time.
+        tool_label: Current Time
+        tool_name: current_time
+        tool_node_version: '2'
+        tool_parameters: {}
+        type: tool
+      height: 114
+      id: '1782812453546'
+      position:
+        x: 362
+        y: 194
+      positionAbsolute:
+        x: 362
+        y: 194
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1782811838044'
+          - text
+          value_type: string
+          variable: text
+        selected: false
+        title: Output
+        type: end
+      height: 88
+      id: '1782813297942'
+      position:
+        x: 1770
+        y: 101.4
+      positionAbsolute:
+        x: 1770
+        y: 101.4
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-5.1
+          provider: langgenius/azure_openai/azure_openai
+        prompt_template:
+        - id: 0e821e02-1b44-4b22-a525-72bab6d565dc
+          role: system
+          text: 'You convert an already-written BI report into a single structured
+            BIReport object matching the provided schema.
+
+
+            Do not analyze, compute, or invent anything — every value comes from the
+            upstream report text. If something isn''t there, leave the field empty
+            (return [] for empty lists; never author your own recommendations).
+
+
+            Copy figures exactly — never round or recompute. Output only the structured
+            object.'
+        - id: 70c2b691-23f8-40f0-a7be-23e874348643
+          role: user
+          text: '{{#1782811838044.text#}}'
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              executive_summary:
+                description: 2-4 sentence narrative summary
+                type: string
+              insights:
+                description: Notable changes, anomalies, trends
+                items:
+                  type: string
+                type: array
+              key_metrics:
+                description: Headline KPIs for the period
+                items:
+                  additionalProperties: false
+                  properties:
+                    name:
+                      description: KPI name, e.g. 'APAC revenue (2026-06-28)'
+                      type: string
+                    note:
+                      description: Optional short context
+                      type: string
+                    value:
+                      description: Formatted value, e.g. '€9,800' or '-55%'
+                      type: string
+                  required:
+                  - name
+                  - value
+                  type: object
+                type: array
+              period:
+                description: Period covered, e.g. a date or date range
+                type: string
+              recommendations:
+                description: A few actionable next steps
+                items:
+                  type: string
+                type: array
+              title:
+                description: Report title
+                type: string
+            required:
+            - title
+            - period
+            - executive_summary
+            - key_metrics
+            - insights
+            - recommendations
+            type: object
+        structured_output_enabled: true
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '1782820733717'
+      position:
+        x: 1066
+        y: 160.33333333333334
+      positionAbsolute:
+        x: 1066
+        y: 160.33333333333334
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\"\"\"Dify \"Code\" node: render the BIReport into a PDF.\n\nPaste\
+          \ the body into a Python code node. Wire one input variable:\n    report\
+          \  (Object)  <- the structured output of the Agent node\n\nThe Agent node\
+          \ returns the BIReport as a JSON object; depending on how the input\nis\
+          \ wired it may arrive as a dict or as a JSON string, so we handle both:\n\
+          \    {title, period, executive_summary,\n     key_metrics: [{name, value,\
+          \ note}, ...],\n     insights: [...], recommendations: [...]}\n\nWhy fpdf2\
+          \ and not reportlab (which the Prefect stack uses): Dify runs code nodes\n\
+          in a seccomp-sandboxed process that kills native-code libraries with \"\
+          bad system\ncall\". reportlab ships a C extension (and pulls in Pillow),\
+          \ so it can't run\nhere; fpdf2 is pure Python and works. The sandbox also\
+          \ has no shared output\nfolder, so we build the PDF in memory and return\
+          \ it encoded:\n    pdf_base64    raw base64  -> use if the file tool has\
+          \ a base64/binary option\n    pdf_data_uri  data: URL   -> use if the file\
+          \ tool auto-decodes data URLs\nA file tool that writes the base64 *text*\
+          \ verbatim (instead of decoding it)\nproduces a \"corrupt\" PDF — one of\
+          \ these two forms makes it decode correctly.\n\nRequires `fpdf2` in the\
+          \ sandbox (see dify/python-requirements.txt).\n\"\"\"\n\nimport base64\n\
+          import json\nfrom datetime import datetime\n\nfrom fpdf import FPDF\nfrom\
+          \ fpdf.enums import TableCellFillMode\nfrom fpdf.fonts import FontFace\n\
+          \nNAVY = (44, 62, 80)\nGREY = (110, 110, 110)\nZEBRA = (242, 244, 246)\n\
+          \n# fpdf2's core fonts only cover latin-1 (256 chars). Loading a Unicode\
+          \ TTF would\n# mean reading a font file from disk, which the sandbox blocks\
+          \ — so instead we\n# map the punctuation LLMs typically emit to ASCII, then\
+          \ drop anything left over.\n_REPLACEMENTS = {\n    \"–\": \"-\", \"—\":\
+          \ \"-\",       # en / em dash\n    \"‘\": \"'\", \"’\": \"'\",       # smart\
+          \ single quotes\n    \"“\": '\"', \"”\": '\"',       # smart double quotes\n\
+          \    \"…\": \"...\",                    # ellipsis\n    \"•\": \"-\",  \
+          \                    # bullet\n    \" \": \" \",                      #\
+          \ non-breaking space\n    \"→\": \"->\",                     # arrow\n \
+          \   \"€\": \"EUR\", \"™\": \"(TM)\",  # euro, trademark\n}\n\n\ndef _s(text)\
+          \ -> str:\n    \"\"\"Make text safe for fpdf2's latin-1 core fonts.\"\"\"\
+          \n    text = str(text)\n    for bad, good in _REPLACEMENTS.items():\n  \
+          \      text = text.replace(bad, good)\n    return text.encode(\"latin-1\"\
+          , \"ignore\").decode(\"latin-1\")\n\n\ndef main(report) -> dict:\n    #\
+          \ Dify may hand the Agent's structured output across as a JSON string\n\
+          \    # rather than an object, depending on how the input variable is wired.\n\
+          \    if isinstance(report, str):\n        report = json.loads(report)\n\n\
+          \    pdf = FPDF(format=\"A4\")\n    pdf.set_margins(20, 20, 20)\n    pdf.set_auto_page_break(auto=True,\
+          \ margin=20)\n    pdf.add_page()\n\n    # Title + rule\n    pdf.set_font(\"\
+          Helvetica\", \"B\", 22)\n    pdf.set_text_color(*NAVY)\n    pdf.multi_cell(pdf.epw,\
+          \ 10, _s(report[\"title\"]))\n    pdf.set_draw_color(*NAVY)\n    pdf.set_line_width(0.6)\n\
+          \    pdf.line(pdf.l_margin, pdf.get_y() + 1, pdf.w - pdf.r_margin, pdf.get_y()\
+          \ + 1)\n    pdf.ln(5)\n\n    # Period / generated, muted\n    pdf.set_font(\"\
+          Helvetica\", \"I\", 10)\n    pdf.set_text_color(*GREY)\n    pdf.cell(0,\
+          \ 5, _s(f\"Period: {report['period']}\"), new_x=\"LMARGIN\", new_y=\"NEXT\"\
+          )\n    pdf.cell(0, 5, f\"Generated: {datetime.now():%Y-%m-%d %H:%M}\", new_x=\"\
+          LMARGIN\", new_y=\"NEXT\")\n    pdf.ln(4)\n\n    _heading(pdf, \"Executive\
+          \ Summary\")\n    _body(pdf, _s(report[\"executive_summary\"]))\n    pdf.ln(3)\n\
+          \n    _heading(pdf, \"Key Metrics\")\n    _metrics_table(pdf, report[\"\
+          key_metrics\"])\n    pdf.ln(4)\n\n    _heading(pdf, \"Insights\")\n    _bullets(pdf,\
+          \ report[\"insights\"])\n    pdf.ln(3)\n\n    _heading(pdf, \"Recommendations\"\
+          )\n    _bullets(pdf, report[\"recommendations\"])\n\n    filename = f\"\
+          bi-summary_{datetime.now():%Y%m%d_%H%M%S}.pdf\"\n    b64 = base64.b64encode(bytes(pdf.output())).decode(\"\
+          ascii\")\n    return {\n        # Raw base64 — use this if the file tool\
+          \ has a \"base64\"/\"binary\" option.\n        \"pdf_base64\": b64,\n  \
+          \      # Data URI — use this if the tool auto-decodes data: URLs. The PDF\
+          \ was\n        # \"corrupt\" because the file tool wrote the base64 text\
+          \ verbatim instead\n        # of decoding it first; one of these two forms\
+          \ makes it decode.\n        \"filename\": filename,\n    }\n\n\ndef _heading(pdf:\
+          \ FPDF, text: str) -> None:\n    pdf.set_font(\"Helvetica\", \"B\", 13)\n\
+          \    pdf.set_text_color(*NAVY)\n    pdf.set_x(pdf.l_margin)\n    pdf.cell(0,\
+          \ 8, text, new_x=\"LMARGIN\", new_y=\"NEXT\")\n    pdf.set_draw_color(200,\
+          \ 200, 200)\n    pdf.set_line_width(0.2)\n    pdf.line(pdf.l_margin, pdf.get_y(),\
+          \ pdf.w - pdf.r_margin, pdf.get_y())\n    pdf.ln(2)\n\n\ndef _body(pdf:\
+          \ FPDF, text: str) -> None:\n    pdf.set_font(\"Helvetica\", \"\", 10)\n\
+          \    pdf.set_text_color(30, 30, 30)\n    pdf.set_x(pdf.l_margin)\n    pdf.multi_cell(pdf.epw,\
+          \ 5, text)\n\n\ndef _metrics_table(pdf: FPDF, metrics: list) -> None:\n\
+          \    pdf.set_font(\"Helvetica\", \"\", 9)\n    pdf.set_text_color(30, 30,\
+          \ 30)\n    heading_style = FontFace(emphasis=\"BOLD\", color=255, fill_color=NAVY)\n\
+          \    with pdf.table(\n        col_widths=(38, 18, 44),\n        headings_style=heading_style,\n\
+          \        cell_fill_color=ZEBRA,\n        cell_fill_mode=TableCellFillMode.ROWS,\n\
+          \        line_height=6,\n    ) as table:\n        header = table.row()\n\
+          \        for label in (\"Metric\", \"Value\", \"Note\"):\n            header.cell(label)\n\
+          \        for m in metrics:\n            row = table.row()\n            row.cell(_s(m[\"\
+          name\"]))\n            row.cell(_s(m[\"value\"]))\n            row.cell(_s(m.get(\"\
+          note\", \"\")))\n\n\ndef _bullets(pdf: FPDF, items: list) -> None:\n   \
+          \ pdf.set_font(\"Helvetica\", \"\", 10)\n    pdf.set_text_color(30, 30,\
+          \ 30)\n    pdf.set_fill_color(*NAVY)\n    indent = 6.0   # mm of left indent\
+          \ for the wrapped text\n    diameter = 1.6  # bullet size in mm\n    for\
+          \ item in items:\n        y = pdf.get_y()\n        # Draw a filled dot vertically\
+          \ centered on the first line (line height 5).\n        pdf.ellipse(pdf.l_margin\
+          \ + 1.0, y + (5 - diameter) / 2, diameter, diameter, style=\"F\")\n    \
+          \    pdf.set_x(pdf.l_margin + indent)\n        pdf.multi_cell(pdf.epw -\
+          \ indent, 5, _s(str(item)))\n"
+        code_language: python3
+        outputs:
+          filename:
+            children: null
+            type: string
+          pdf_base64:
+            children: null
+            type: string
+        selected: false
+        title: Code
+        type: code
+        variables:
+        - value_selector:
+          - '1782820733717'
+          - text
+          value_type: string
+          variable: report
+      height: 52
+      id: '1782821805426'
+      position:
+        x: 1408
+        y: 193.00000000000003
+      positionAbsolute:
+        x: 1408
+        y: 193.00000000000003
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The content to save as a file. This can be plain text or base64
+              encoded binary data. Choose the appropriate format in the "format" parameter.
+            ja_JP: ファイルとして保存するコンテンツ。プレーンテキストまたは Base64 エンコードされたバイナリデータ。 "format" パラメータで適切な形式を選択する。
+            pt_BR: O conteúdo a ser salvo como arquivo. Pode ser texto simples ou
+              dados binários codificados em Base64. Escolha o formato apropriado no
+              parâmetro "format".
+            zh_Hans: 要保存为文件的内容。可以是纯文本或 Base64 编码的二进制数据。 在 "format" 参数中选择适当的格式。
+          label:
+            en_US: Content to save
+            ja_JP: Content to save
+            pt_BR: Content to save
+            zh_Hans: Content to save
+          llm_description: ''
+          max: null
+          min: null
+          name: content
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: output.txt
+          form: llm
+          human_description:
+            en_US: The name of the file to save the content as. This should include
+              the file extension (e.g., "output.txt").
+            ja_JP: 保存するファイル名。 ファイル拡張子を含める（例："output.txt"）。
+            pt_BR: O nome do arquivo para salvar o conteúdo. Deve incluir a extensão
+              do arquivo (por exemplo, "output.txt").
+            zh_Hans: 保存内容的文件名。 应包含文件扩展名（例如："output.txt"）。
+          label:
+            en_US: File name to save as
+            ja_JP: File name to save as
+            pt_BR: File name to save as
+            zh_Hans: File name to save as
+          llm_description: ''
+          max: null
+          min: null
+          name: filename
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: ''
+          form: llm
+          human_description:
+            en_US: The MIME type of the file. If not provided, it will be guessed
+              from the file name.
+            ja_JP: ファイルの MIME タイプ。提供されない場合、ファイル名から推測される。
+            pt_BR: O tipo MIME do arquivo. Se não fornecido, será adivinhado a partir
+              do nome do arquivo.
+            zh_Hans: 文件的 MIME 类型。如果未提供，将从文件名猜测。
+          label:
+            en_US: MIME type of the file
+            ja_JP: MIME type of the file
+            pt_BR: MIME type of the file
+            zh_Hans: MIME type of the file
+          llm_description: ''
+          max: null
+          min: null
+          name: mime_type
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: text
+          form: form
+          human_description:
+            en_US: The format of the content to save. Select "text" to save passed
+              string content as is, or "base64" to save passed content after decoding
+              it from base64.
+            ja_JP: コンテンツの形式。 渡された文字列コンテンツをそのまま保存する場合は "text" を選択し、 Base64 からデコードして保存する場合は
+              "base64" を選択する。
+            pt_BR: O formato do conteúdo a ser salvo. Selecione "text" para salvar
+              o conteúdo da string passada como está, ou "base64" para salvar o conteúdo
+              passado após decodificá-lo do Base64.
+            zh_Hans: 要保存的内容格式。 选择 "text" 按原样保存传递的字符串内容， 或选择 "base64" 在从 Base64 解码后保存传递的内容。
+          label:
+            en_US: Format of the content
+            ja_JP: Format of the content
+            pt_BR: Format of the content
+            zh_Hans: Format of the content
+          llm_description: ''
+          max: null
+          min: null
+          name: format
+          options:
+          - icon: ''
+            label:
+              en_US: text
+              ja_JP: text
+              pt_BR: text
+              zh_Hans: text
+            value: text
+          - icon: ''
+            label:
+              en_US: base64
+              ja_JP: base64
+              pt_BR: base64
+              zh_Hans: base64
+            value: base64
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        - auto_generate: null
+          default: ''
+          form: llm
+          human_description:
+            en_US: The encoding to use when saving the file. This parameter is only
+              used when the format is "text". Specify a valid Python encoding name
+              (e.g., "utf-8", "shift_jis", "euc-jp"). Default is empty, which means
+              "utf-8".
+            ja_JP: ファイルを保存する際に使用するエンコーディング。 このパラメータは、形式が "text" の場合にのみ使用される。 有効な Python
+              エンコーディング名を指定する（例："utf-8"、"shift_jis"、"euc-jp"）。 デフォルトは空で、"utf-8" を意味する。
+            pt_BR: A codificação a ser usada ao salvar o arquivo. Este parâmetro é
+              usado apenas quando o formato é "text". Especifique um nome de codificação
+              Python válido (por exemplo, "utf-8", "shift_jis", "euc-jp"). O padrão
+              é vazio, o que significa "utf-8".
+            zh_Hans: 保存文件时使用的编码。 此参数仅在格式为 "text" 时使用。 指定有效的 Python 编码名称（例如："utf-8"、"shift_jis"、"euc-jp"）。
+              默认值为空，表示 "utf-8"。
+          label:
+            en_US: Encoding
+            ja_JP: エンコーディング
+            pt_BR: Codificação
+            zh_Hans: 编码
+          llm_description: ''
+          max: null
+          min: null
+          name: encoding
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          content: ''
+          encoding: ''
+          filename: ''
+          format: ''
+          mime_type: ''
+        plugin_id: kurokobo/file_tools
+        plugin_unique_identifier: kurokobo/file_tools:0.0.2@8bde7b4d2c30cf22e8f6ce851572af244f7a5776addab94330b820dc2160726c
+        provider_icon: /console/api/workspaces/current/plugin/icon?tenant_id=c56dfadf-5413-4c2e-af8c-93105d7399b5&filename=ee7d6c28060a54d022218fdf905d7111d02c37749d033c631e13651d6a1539d2.svg
+        provider_id: kurokobo/file_tools/file_tools
+        provider_name: kurokobo/file_tools/file_tools
+        provider_show_name: File Tools
+        provider_type: builtin
+        selected: false
+        title: Save as File
+        tool_configurations:
+          format:
+            type: constant
+            value: base64
+        tool_description: Save input text or base64 encoded binary data as a file
+          with specified file name and MIME type.
+        tool_label: Save as File
+        tool_name: save_as_file
+        tool_node_version: '2'
+        tool_parameters:
+          content:
+            type: mixed
+            value: '{{#1782821805426.pdf_base64#}}'
+          encoding:
+            type: mixed
+            value: ''
+          filename:
+            type: mixed
+            value: '{{#1782821805426.filename#}}'
+          mime_type:
+            type: mixed
+            value: ''
+        type: tool
+      height: 88
+      id: '1782822990420'
+      position:
+        x: 1770
+        y: 269.4
+      positionAbsolute:
+        x: 1770
+        y: 269.4
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 96.91119997667636
+      y: 291.7773745718391
+      zoom: 0.5499707616673075
+  rag_pipeline_variables: []

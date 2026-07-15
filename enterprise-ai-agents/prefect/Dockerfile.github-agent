@@ -1,0 +1,23 @@
+# GitHub issue review agent worker image — registers the manual (unscheduled)
+# deployment so you can trigger runs against the Prefect server. Built with uv.
+# See the README ("Serve it" under the GitHub agent). Identical to
+# Dockerfile.bi-agent except for the CMD.
+FROM python:3.12-slim
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+WORKDIR /app
+
+# Install dependencies first (cached unless deps change).
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev
+
+# Then the source, and install the project (provides the agent CLI scripts).
+COPY agents ./agents
+COPY flows ./flows
+RUN uv sync --frozen --no-dev
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Register the manual deployment (no schedule); trigger runs with parameters.
+CMD ["github-issue-agent-serve"]

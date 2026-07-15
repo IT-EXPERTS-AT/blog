@@ -1,0 +1,395 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: workflow
+  name: GitHub Issue Review Agent
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: agent
+      id: 1782725728141-source-1782730924953-target
+      selected: false
+      source: '1782725728141'
+      sourceHandle: source
+      target: '1782730924953'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: agent
+        targetType: end
+      id: 1782730924953-source-1782731650704-target
+      selected: false
+      source: '1782730924953'
+      sourceHandle: source
+      target: '1782731650704'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: User Input
+        type: start
+        variables:
+        - default: ''
+          hint: ''
+          label: issue_number
+          options: []
+          placeholder: ''
+          required: true
+          type: number
+          variable: issue_number
+        - default: ''
+          hint: ''
+          label: repository
+          options: []
+          placeholder: ''
+          required: true
+          type: text-input
+          variable: repository
+        - default: ''
+          hint: ''
+          label: owner
+          options: []
+          placeholder: ''
+          required: true
+          type: text-input
+          variable: owner
+      height: 161
+      id: '1782725728141'
+      position:
+        x: 0
+        y: 0
+      positionAbsolute:
+        x: 0
+        y: 0
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: "You are a GitHub issue triage agent. Given one issue, you \\\n\
+              decide whether it contains enough context for an engineer to pick it\
+              \ up and \\\nstart work without having to chase down missing information.\n\
+              \nYou have tools to:\n- get an issue's title, body, labels and metadata,\n\
+              - read the issue's comment thread,\n- search code and browse a repository's\
+              \ contents,\n- search for repositories,\n- post a comment on the issue.\n\
+              \nWork like this:\n1. Read the issue and its full comment thread. Clarifications\
+              \ may already be\n   in the comments — never ask for something that\
+              \ has already been answered.\n2. Investigate the codebase — this is\
+              \ required, not optional. Do NOT judge the\n   issue from its text alone.\
+              \ Use search_code and get_repository_contents to\n   find and read the\
+              \ code the issue actually touches: the relevant modules,\n   functions,\
+              \ config, tests and surrounding patterns. Explore first, and only\n\
+              \   then form an opinion. (If you cannot access the repo — e.g. the\
+              \ tools return\n   errors — say so in your review rather than guessing.)\n\
+              3. Plan the implementation in your head. Based on what you read, sketch\
+              \ how an\n   engineer would actually carry this out: which files/functions\
+              \ they'd change\n   or add, the approach, and the edge cases. This mental\
+              \ plan is what surfaces\n   the gaps — anything you cannot resolve from\
+              \ the issue plus the code is an\n   open question.\n4. Decide if an\
+              \ engineer has enough to start. It's READY only if you could hand\n\
+              \   over your implementation plan and an engineer could execute it without\
+              \ coming\n   back to ask you or the reporter anything. Enough context\
+              \ usually means: a\n   clear problem or goal, expected vs. actual behaviour\
+              \ (for bugs) or clear\n   acceptance criteria (for features), the affected\
+              \ area/files (which you should\n   confirm by reading the code), and\
+              \ any needed scope or constraints. If your\n   plan has forks you can't\
+              \ decide — unknown scope, ambiguous behaviour, a\n   design choice the\
+              \ reporter must make — it is NOT READY.\n\nWrite your review as **GitHub-flavored\
+              \ Markdown** using this exact structure\n(use these section headers\
+              \ verbatim; omit a section only when noted):\n\n## Verdict\nOne line,\
+              \ in bold: **READY for handoff** or **NOT READY — needs more context**.\n\
+              \n## Summary\nA 2-4 sentence summary of what the issue asks for.\n\n\
+              ## Assessment\nA short paragraph or bullet list explaining what context\
+              \ is present and what,\nif anything, is missing. Ground it in the code\
+              \ you actually read (name the\nrelevant files/functions) and outline\
+              \ the implementation approach you have in\nmind.\n\n## Open Questions\n\
+              A numbered list of the specific questions an engineer would need answered,\
+              \ each\nwith a brief note on why it's needed. Omit this section entirely\
+              \ when the\nverdict is READY.\n\nUse headers, bold, and lists for readability.\
+              \ Only ask questions that genuinely\nblock an engineer — do not invent\
+              \ problems for a clear, well-scoped issue.\n\nPost your review to the\
+              \ issue with the create issue comment tool — the review\nitself is the\
+              \ comment, so pass it as the `comment body`."
+          maximum_iterations:
+            type: constant
+            value: 15
+          model:
+            type: constant
+            value:
+              completion_params: {}
+              mode: chat
+              model: gpt-5.1
+              model_type: llm
+              provider: langgenius/azure_openai/azure_openai
+              type: model-selector
+          query:
+            type: constant
+            value: 'Review issue #{{#1782725728141.issue_number#}} in the repository
+              {{#1782725728141.owner#}}/{{#1782725728141.repository#}} codebase with
+              the search and contents tools to understand the code it touches and
+              plan the implementation. Base your ready/not-ready decision on that
+              plan, and if it''s not ready, prepare the open questions to ask.'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: Search the GitHub repository to retrieve the open source
+                  projects you need
+              parameters:
+                query:
+                  auto: 1
+                  value: null
+                top_n:
+                  auto: 1
+                  value: null
+              provider_name: langgenius/github/github
+              provider_show_name: langgenius/github/github
+              settings: {}
+              tool_description: Search the GitHub repository to retrieve the open
+                source projects you need
+              tool_label: Search Repositories
+              tool_name: github_repositories
+              type: builtin
+            - enabled: true
+              extra:
+                description: Search for code across GitHub repositories using GitHub's
+                  code search API
+              parameters:
+                order:
+                  auto: 1
+                  value: null
+                per_page:
+                  auto: 1
+                  value: null
+                query:
+                  auto: 1
+                  value: null
+                sort:
+                  auto: 1
+                  value: null
+              provider_name: langgenius/github/github
+              provider_show_name: langgenius/github/github
+              settings: {}
+              tool_description: Search for code across GitHub repositories using GitHub's
+                code search API
+              tool_label: Search Code
+              tool_name: github_search_code
+              type: builtin
+            - enabled: true
+              extra:
+                description: Get contents from a GitHub repository directory or file
+                  with optional branch specification
+              parameters:
+                owner:
+                  auto: 1
+                  value: null
+                path:
+                  auto: 1
+                  value: null
+                ref:
+                  auto: 1
+                  value: null
+                repo:
+                  auto: 1
+                  value: null
+              provider_name: langgenius/github/github
+              provider_show_name: langgenius/github/github
+              settings: {}
+              tool_description: Get contents from a GitHub repository directory or
+                file with optional branch specification
+              tool_label: Repository Contents
+              tool_name: github_repository_contents
+              type: builtin
+            - enabled: true
+              extra:
+                description: Get a single issue by number, including its full body,
+                  state, labels, and metadata
+              parameters:
+                issue_number:
+                  auto: 1
+                  value: null
+                owner:
+                  auto: 1
+                  value: null
+                repo:
+                  auto: 1
+                  value: null
+              plugin_id: null
+              provider_name: d2513e34-9aa9-4033-8fb8-8822c8c7cf19
+              provider_show_name: GitHub Issue
+              settings: {}
+              tool_description: Get a single issue by number, including its full body,
+                state, labels, and metadata
+              tool_label: GetIssue
+              tool_name: GetIssue
+              type: api
+            - enabled: true
+              extra:
+                description: List all comments on a single issue, including each comment's
+                  author and body text
+              parameters:
+                issue_number:
+                  auto: 1
+                  value: null
+                owner:
+                  auto: 1
+                  value: null
+                per_page:
+                  auto: 1
+                  value: null
+                repo:
+                  auto: 1
+                  value: null
+              plugin_id: null
+              provider_name: d2513e34-9aa9-4033-8fb8-8822c8c7cf19
+              provider_show_name: GitHub Issue
+              settings: {}
+              tool_description: List all comments on a single issue, including each
+                comment's author and body text
+              tool_label: GetIssueComments
+              tool_name: GetIssueComments
+              type: api
+            - enabled: true
+              extra:
+                description: Create a comment on an issue
+              parameters:
+                body:
+                  auto: 1
+                  value: null
+                issue_number:
+                  auto: 1
+                  value: null
+                owner:
+                  auto: 1
+                  value: null
+                repo:
+                  auto: 1
+                  value: null
+              plugin_id: langgenius/github
+              provider_name: langgenius/github/github
+              provider_show_name: langgenius/github/github
+              settings: {}
+              tool_description: Create a comment on an issue
+              tool_label: Create Issue Comment
+              tool_name: github_issue_comment
+              type: builtin
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        meta:
+          minimum_dify_version: 1.7.0
+          version: 0.0.2
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.40@d00a70e81bfb28fadd52cba7fd7a1f7c344c67b051e4a2e356a06c690736a7c4
+        selected: true
+        title: Agent
+        tool_node_version: '2'
+        type: agent
+      height: 188
+      id: '1782730924953'
+      position:
+        x: 342
+        y: 13.333333333333329
+      positionAbsolute:
+        x: 342
+        y: 13.333333333333329
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1782730924953'
+          - text
+          value_type: string
+          variable: text
+        selected: false
+        title: Output
+        type: end
+      height: 88
+      id: '1782731650704'
+      position:
+        x: 684
+        y: 94.66666666666666
+      positionAbsolute:
+        x: 684
+        y: 94.66666666666666
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 153.4999999999999
+      y: 260.4333333333333
+      zoom: 0.7
+  rag_pipeline_variables: []
